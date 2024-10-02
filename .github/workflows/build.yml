@@ -34,7 +34,7 @@ jobs:
 
     strategy:
       matrix:
-        cuda: ['12.4.1', '12.5.1']
+        cuda: ['12.4.1']
         build: ['cuda']
 
     steps:
