@@ -7,10 +7,6 @@ on:
         description: 'Create new release'
         required: true
         type: boolean
-  push:
-    branches:
-      - master
-    paths: ['.github/workflows/release.yml', '**/CMakeLists.txt', '**/.cmake', '**/*.h', '**/*.hpp', '**/*.c', '**/*.cpp', '**/*.cu', '**/*.cuh', '**/*.swift', '**/*.m', '**/*.metal', '**/*.comp']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref && github.ref || github.run_id }}
@@ -27,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        cuda: ['12.4']
+        cuda: ['12.6']
 
     steps:
       - name: Clone
@@ -59,6 +55,7 @@ jobs:
           cmake -S . -B build -G "Ninja Multi-Config" ^
             -DGGML_BACKEND_DL=ON ^
             -DGGML_NATIVE=OFF ^
+            -DGGML_CUDA_FA_ALL_QUANTS=ON ^
             -DGGML_CPU=OFF ^
             -DGGML_CUDA=ON ^
             -DLLAMA_CURL=OFF
