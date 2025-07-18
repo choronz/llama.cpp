@@ -2,6 +2,9 @@ name: Build Win Wheel
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref && github.ref || github.run_id }}
@@ -40,7 +43,7 @@ jobs:
           method: 'network'
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust"]'
           use-github-cache: false
-          use-local-cache: true
+          use-local-cache: false
 
       - name: Build
         id: cmake_build
