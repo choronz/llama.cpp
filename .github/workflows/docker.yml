@@ -18,7 +18,7 @@ jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       COMMIT_SHA: ${{ github.sha }}
     strategy:
@@ -116,25 +116,6 @@ jobs:
           tags: ${{ steps.tag.outputs.full_output_tags }}
           file: ${{ matrix.config.dockerfile }}
           target: full
-          provenance: false
-          # using github experimental cache
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          # return to this if the experimental github cache is having issues
-          #cache-to: type=local,dest=/tmp/.buildx-cache
-          #cache-from: type=local,src=/tmp/.buildx-cache
-
-      - name: Build and push Light Docker image (tagged + versioned)
-        if: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.config.light == true }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: ${{ matrix.config.platforms }}
-          # tag list is generated from step above
-          tags: ${{ steps.tag.outputs.light_output_tags }}
-          file: ${{ matrix.config.dockerfile }}
-          target: light
           provenance: false
           # using github experimental cache
           cache-from: type=gha
