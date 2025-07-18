@@ -41,8 +41,8 @@ jobs:
         with:
           cuda: ${{ matrix.cuda }}
           method: 'network'
-          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust"]'
-          linux-local-args: '[ "" ]'
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev",  "nvrtc", "nvrtc_dev", "thrust"]'
+          linux-local-args: '[ "--samples" ]'
           use-github-cache: false
           use-local-cache: false
 
