@@ -39,6 +39,8 @@ jobs:
           cuda: ${{ matrix.cuda }}
           method: 'network'
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust"]'
+          use-github-cache: false
+          use-local-cache: true
 
       - name: Build
         id: cmake_build
