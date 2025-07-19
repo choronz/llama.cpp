@@ -14,7 +14,7 @@ concurrency:
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-  CMAKE_ARGS: "-DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_TOOLS=ON -DLLAMA_BUILD_SERVER=ON -DGGML_RPC=ON"
+  CMAKE_ARGS: "-DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_TOOLS=ON -DLLAMA_BUILD_SERVER=ON -DGGML_CUDA=ON"
 
 jobs:
 
@@ -53,25 +53,25 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           cmake -S . -B build -G "Ninja Multi-Config" ^
-            -DGGML_BACKEND_DL=ON ^
-            -DGGML_NATIVE=OFF ^
-            -DGGML_CUDA_FA_ALL_QUANTS=ON ^
-            -DGGML_CPU=OFF ^
-            -DGGML_CUDA=ON ^
-            -DLLAMA_CURL=OFF
+            -DLLAMA_BUILD_SERVER=ON -DGGML_CUDA=ON ^
+            -DGGML_CUDA_F16=ON -DGGML_CUDA_FA_ALL_QUANTS=ON ^
+            -DGGML_CUDA_F16=ON -DGGML_CUDA_DMMV_X=64 -DGGML_CUDA_MMV_Y=2 -DK_QUANTS_PER_ITERATION=2 ^
+            -DGGML_BACKEND_DL=ON -DGGML_NATIVE=OFF ^
+            -DGGML_RPC=OFF -DLLAMA_CURL=OFF
           set /A NINJA_JOBS=%NUMBER_OF_PROCESSORS%-1
-          cmake --build build --config Release -j %NINJA_JOBS% --target ggml-cuda
+          cmake --build build --config Release -j %NINJA_JOBS%
+        # --target ggml-cuda
 
       - name: Pack artifacts
         id: pack_artifacts
         run: |
-          7z a llama-bin-win-cuda-${{ matrix.cuda }}-x64.zip .\build\bin\Release\ggml-cuda.dll
+          7z a llama-bin-win-cuda-${{ matrix.cuda }}.zip .\build\bin\Release\ggml-cuda.dll
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          path: llama-bin-win-cuda-${{ matrix.cuda }}-x64.zip
-          name: llama-bin-win-cuda-x64.zip
+          path: llama-bin-win-cuda-${{ matrix.cuda }}.zip
+          name: llama-bin-win-cuda.zip
 
   release:
     if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
