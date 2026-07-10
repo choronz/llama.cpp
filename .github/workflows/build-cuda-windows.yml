@@ -29,7 +29,9 @@ jobs:
 
     strategy:
       matrix:
-        cuda: ['12.4', '13.3']
+        cuda:
+          - '12.8'
+          # - '13.3'
 
     steps:
       - name: Clone
@@ -76,6 +78,7 @@ jobs:
           key: release-windows-2022-x64-cuda-${{ matrix.cuda }}
 
   hip:
+    if: false # disabled: non-CUDA platform
     runs-on: windows-2022
 
     permissions:
