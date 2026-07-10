@@ -1,4 +1,4 @@
-name: CI (CUDA, ubuntu)
+name: CI (CUDA ubuntu)
 
 on:
   workflow_dispatch: # allows manual triggering
@@ -66,6 +66,9 @@ jobs:
             -DLLAMA_FATAL_WARNINGS=ON \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CUDA_ARCHITECTURES=89-real \
+            -DGGML_CUDA_FA_ALL_QUANTS=ON \
+            -DGGML_CUDA_F16=ON -DGGML_CUDA_IQK_FORCE_BF16=1 \
+            -DGGML_SCHED_MAX_COPIES=1 \
             -DCMAKE_EXE_LINKER_FLAGS=-Wl,--allow-shlib-undefined \
             -DGGML_NATIVE=OFF \
             -DGGML_CUDA=ON \
