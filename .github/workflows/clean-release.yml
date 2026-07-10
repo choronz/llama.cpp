@@ -35,7 +35,7 @@ jobs:
           echo "Cutoff (3 months ago): $(date -d @"$CUTOFF_EPOCH" -u)"
           echo "Keeping latest: $KEEP_LATEST | dry_run=${DRY_RUN:-false}"
 
-          mapfile -t rows < <(gh release list --limit 100 --json tagName,createdAt --jq '.[] | "\(.tagName)\t\(.createdAt)"')
+          mapfile -t rows < <(gh release list --repo "$GH_REPOSITORY" --limit 100 --json tagName,createdAt --jq '.[] | "\(.tagName)\t\(.createdAt)"')
 
           if [ "${#rows[@]}" -eq 0 ]; then
             echo "No releases found."
@@ -58,7 +58,7 @@ jobs:
                 echo "WOULD DELETE (#$i, >3m)   $tag"
               else
                 echo "DELETE (#$i, >3m)         $tag"
-                gh release delete "$tag" --yes --cleanup-tag || echo "  ! failed to delete $tag"
+                gh release delete --repo "$GH_REPOSITORY" "$tag" --yes --cleanup-tag || echo "  ! failed to delete $tag"
               fi
             else
               echo "KEEP   (#$i, recent)        $tag"
