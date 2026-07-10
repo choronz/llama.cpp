@@ -283,6 +283,16 @@ jobs:
         id: tag
         uses: ./.github/actions/get-tag-name
 
+      - name: Delete existing release if present
+        run: |
+          tag="${{ steps.tag.outputs.name }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists, deleting before recreate..."
+            gh release delete "$tag" --yes
+          else
+            echo "No existing release for $tag"
+          fi
+
       - name: Download artifacts
         id: download-artifact
         uses: actions/download-artifact@v7
