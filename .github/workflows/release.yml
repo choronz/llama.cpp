@@ -259,10 +259,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine tag name
-        id: tag
-        uses: ./.github/actions/get-tag-name
-
       - name: Install dependencies
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -296,13 +292,13 @@ jobs:
         id: pack_artifacts
         run: |
           cp LICENSE ./build/bin/
-          tar -czvf llama-${{ steps.tag.outputs.name }}-bin-ubuntu-cuda-x64.tar.gz --transform "s,^\.,llama-${{ steps.tag.outputs.name }}," -C ./build/bin .
+          tar -czvf llama-bin-ubuntu-cuda-x64.tar.gz --transform "s,^\.,llama-bin-ubuntu-cuda-x64," -C ./build/bin .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
         with:
-          path: llama-${{ steps.tag.outputs.name }}-bin-ubuntu-cuda-x64.tar.gz
-          name: llama-${{ steps.tag.outputs.name }}-bin-ubuntu-cuda-x64.tar.gz
+          path: llama-bin-ubuntu-cuda-x64.tar.gz
+          name: llama-bin-ubuntu-cuda-x64.tar.gz
 
   release:
     if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event.inputs.create_release == 'true' }}
@@ -367,6 +363,7 @@ jobs:
         id: move_artifacts
         run: |
           mkdir -p release
+          shopt -s nullglob
 
           echo "Adding CPU backend files to existing zips..."
           for arch in x64; do
@@ -389,9 +386,16 @@ jobs:
           done
 
           echo "Renaming and moving zips to release..."
-          for zip_file in artifact/llama-bin-win-*.zip; do
-            base_name=$(basename "$zip_file" .zip)
-            zip_name="llama-${{ steps.tag.outputs.name }}-${base_name#llama-}.zip"
+          for zip_file in artifact/llama-bin-win-*.zip artifact/llama-bin-ubuntu-cuda-x64.tar.gz; do
+            base_name=$(basename "$zip_file")
+            if [[ "$base_name" == *.tar.gz ]]; then
+              bare="${base_name%.tar.gz}"
+              ext=".tar.gz"
+            else
+              bare="${base_name%.zip}"
+              ext=".zip"
+            fi
+            zip_name="llama-${{ steps.tag.outputs.name }}-${bare#llama-}${ext}"
             echo "Moving $zip_file to release/$zip_name"
             mv "$zip_file" "release/$zip_name"
           done
