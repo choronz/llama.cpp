@@ -34,7 +34,7 @@ jobs:
           echo "Cutoff (3 months ago): $(date -d @"$CUTOFF_EPOCH" -u)"
           echo "Keeping latest: $KEEP_LATEST | dry_run=${DRY_RUN:-false}"
 
-          mapfile -t rows < <(gh release list --limit 100 --json tagName,createdAt --jq -r '.[] | "\(.tagName)\t\(.createdAt)"')
+          mapfile -t rows < <(gh release list --limit 100 --json tagName,createdAt --jq '.[] | "\(.tagName)\t\(.createdAt)"')
 
           if [ "${#rows[@]}" -eq 0 ]; then
             echo "No releases found."
